@@ -1,8 +1,11 @@
 from pydub import AudioSegment
 from pydub.generators import WhiteNoise
-import ollama
+# import ollama
 import re
 from gtts import gTTS
+from openai import OpenAI
+from dotenv import load_dotenv
+load_dotenv()
 
 # EEVE text 얻고 .txt로 저장, 각 로그 mp3 생성하는 함수
 def get_text_and_mp3():
@@ -21,7 +24,7 @@ def get_text_and_mp3():
 로그 4이자 유언. 가동 직전 우주의 끝자락에서 남기는 AI의 마지막 기록이다. 감성적이지만, 기계다운 냉정함을 잃지 않도록 작성하라.
 
 
-로그1~4를 컨셉에 맞게 각각 문장 세 개로 작성하라.
+로그1~4를 컨셉에 맞게 각각 문장 네 개로 작성하라.
 
 ## 출력 형식 ##
 
@@ -39,14 +42,22 @@ def get_text_and_mp3():
     all_response = ollama.generate(model='EEVE-Korean-10.8B', prompt=all_prompt)
     with open("eeve_response_text.txt", "w", encoding="utf-8") as f:
         f.write(all_response["response"])
-
+    
     pattern = r"(\d{4}년\s*\d{1,2}월\s*\d{1,2}일\s*기록\..*?)(?=\n\s*(?:로그\s*\d+:|유언:)|\Z)"
 
     matches = re.findall(pattern, all_response['response'], flags=re.DOTALL)
 
+    client = OpenAI()
+    
     for i, body in enumerate(matches, start=1):
-        tts = gTTS(body.strip(), lang='ko')
-        tts.save(f"log_{i}.mp3")
+        with client.audio.speech.with_streaming_response.create(
+            model="tts-1",
+            voice="onyx",
+            input=body.strip()
+        )as response:
+            response.stream_to_file(f'log_{i}.mp3')
+        # tts = gTTS(body.strip(), lang='ko')
+        # tts.save(f"log_{i}.mp3")
 
 # =============================================================================================
 # =============================================================================================
@@ -69,8 +80,9 @@ def get_mp3(path, try_num, vol=35):
     sound = AudioSegment.from_file(path)
 
     # 최초 음원이라면, 빠르기 조절
-    if path[:1] != 'noise':
-        faster = sound.speedup(playback_speed=1.3)
+    if path[:3] == 'log':
+        print('first!')
+        faster = sound.speedup(playback_speed=1.2)
 
     # 피치 조절 (중간 톤 높이기 → 날카로운 기계 톤)
     higher = faster._spawn(faster.raw_data, overrides={
