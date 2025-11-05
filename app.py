@@ -7,9 +7,9 @@ from get_files import get_text_and_mp3, get_last_message, get_mp3
 import time
 
 # 구현해야 할 것
-# 3. 마지막 엔딩 (성공 & 실패) 어떻게 할 것인지 구체적으로.
-# - 성공: 원 음성 듣기~
-# - 실패: 깡!!
+# google tts 말고 openai?
+# runpod에서 해보기... hugging face key랑 openai key 등록, streamlit 실행
+# 리드미;;;
 
 
 # 세션 상태 초기화
