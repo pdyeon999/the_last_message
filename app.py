@@ -1,13 +1,11 @@
 import streamlit as st
-import os
+# import os
 from sentence_transformers import SentenceTransformer
 from sklearn.metrics.pairwise import cosine_similarity
-import numpy as np
 from get_files import get_text_and_mp3, get_last_message, get_mp3
 import time
 
-# 구현해야 할 것
-# google tts 말고 openai?
+
 # runpod에서 해보기... hugging face key랑 openai key 등록, streamlit 실행
 # 리드미;;;
 
@@ -23,7 +21,7 @@ if 'attempt' not in st.session_state:
 
 # 노이즈 수정값
 if 'vol' not in st.session_state:
-    st.session_state.vol = 5
+    st.session_state.vol = 10
 
 # 게임이 종료되었는지 여부
 if 'game_over' not in st.session_state:
@@ -94,13 +92,13 @@ if not st.session_state.messages:
 # 게임 시작 전 - 예시 음성 소개
 if not st.session_state.game_started:
     st.header("👋 게임 소개")
-    st.write("음성 로그를 듣고 내용을 맞춰보세요!")
-    st.write("먼저 몇 가지 예시 음성을 들어보겠습니다.")
+    st.write("음성 로그를 듣고 내용을 맞춰보세요.")
+    st.write("먼저 몇 가지 복원된 음성을 들어보겠습니다.")
     
     st.markdown("---")
     
     # 예시 음성 1
-    st.subheader("📼 예시 음성 1")
+    st.subheader("📼 복원 음성 1")
     example_audio_1 = example_path+str(1)+'.mp3'  # 실제 파일 경로로 변경
     try:
         audio_file = open(example_audio_1, 'rb')
@@ -112,7 +110,7 @@ if not st.session_state.game_started:
     st.markdown("---")
     
     # 예시 음성 2
-    st.subheader("📼 예시 음성 2")
+    st.subheader("📼 복원 음성 2")
     example_audio_2 = example_path+str(2)+'.mp3'  # 실제 파일 경로로 변경
     try:
         audio_file = open(example_audio_2, 'rb')
@@ -124,7 +122,7 @@ if not st.session_state.game_started:
     st.markdown("---")
     
     # 예시 음성 3
-    st.subheader("📼 예시 음성 3")
+    st.subheader("📼 복원 음성 3")
     example_audio_3 = example_path+str(3)+'.mp3'  # 실제 파일 경로로 변경
     try:
         audio_file = open(example_audio_3, 'rb')
@@ -198,7 +196,7 @@ elif st.session_state.game_started and not st.session_state.game_over and st.ses
             # 유사도 계산
             response_embed = st.session_state.model.encode(user_response)
             sim = cosine_similarity([response_embed], [st.session_state.last_message_embed])
-            similarity_score = sim[0][0] * 0.8
+            similarity_score = sim[0][0]
             
             st.session_state.vol += similarity_score*10
             print('바뀐 vol:', st.session_state.vol)
@@ -208,10 +206,10 @@ elif st.session_state.game_started and not st.session_state.game_over and st.ses
             
             # 피드백 제공
             if similarity_score < 0.3:
-                st.error('❌ 너무 낮습니다. 노이즈가 거의 걷어지지 않습니다.')
+                st.error('❌ 너무 낮습니다. 노이즈가 거의 걷어지지 않습니다...')
                 st.session_state.attempt += 1
             elif similarity_score < 0.7:
-                st.warning('⚠️ 한 걸음 다가갔습니다. 노이즈가 조금 걷힙니다.')
+                st.warning('⚠️ 한 걸음 다가갔습니다. 노이즈가 조금 걷힙니다...')
                 st.session_state.attempt += 1
             else:
                 st.success('🎉 맞췄습니다!')
@@ -237,7 +235,7 @@ elif st.session_state.game_over == True:
 
     if st.button("다시 하기"):
         st.session_state.attempt = 0
-        st.session_state.vol = 5
+        st.session_state.vol = 10
         st.session_state.game_over = False
         st.session_state.game_started = False
         st.session_state.messages = False
@@ -252,12 +250,13 @@ elif st.session_state.attempt >= 3:
 
     if st.button("다시 하기"):
         st.session_state.attempt = 0
-        st.session_state.vol = 5
+        st.session_state.vol = 10
         st.session_state.game_over = False
         st.session_state.game_started = False
         st.session_state.messages = False
         st.rerun()
-    
+
+
 # elif st.session_state.game_over:
 #     # 원본 음성 재생
 #     original_audio_path =str(st.session_state.attempt)+'_noise_'+path

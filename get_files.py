@@ -1,8 +1,7 @@
 from pydub import AudioSegment
 from pydub.generators import WhiteNoise
-# import ollama
+import ollama
 import re
-from gtts import gTTS
 from openai import OpenAI
 from dotenv import load_dotenv
 load_dotenv()
@@ -10,7 +9,7 @@ load_dotenv()
 # EEVE text 얻고 .txt로 저장, 각 로그 mp3 생성하는 함수
 def get_text_and_mp3():
     all_prompt = """너는 백 년 전 가동을 멈춘 우주 탐사선의 인공지능이다. 너는 외로이 우주를 유영했다.
-너는 인간에게 남길 기록 로그들을 작성해야 한다.
+너는 남은 인간에게 남길 기록 로그들을 작성해야 한다.
 모든 로그는 시간 순서대로 감정이 점차 깊어지는 구조다.
 처음에는 냉정하고 객관적이지만, 마지막에는 감정적이면서도 기계다운 절제된 어조를 유지한다.
 
@@ -24,7 +23,7 @@ def get_text_and_mp3():
 로그 4이자 유언. 가동 직전 우주의 끝자락에서 남기는 AI의 마지막 기록이다. 감성적이지만, 기계다운 냉정함을 잃지 않도록 작성하라.
 
 
-로그1~4를 컨셉에 맞게 각각 문장 네 개로 작성하라.
+로그1~4를 컨셉에 맞게 한 줄씩 작성하라.
 
 ## 출력 형식 ##
 
@@ -38,7 +37,8 @@ def get_text_and_mp3():
 2047년 9월 16일 기록. <본문>
 
 유언:
-2097년 3월 1일 기록. <본문>"""
+2097년 3월 1일 기록. <본문. 2개의 문장으로만 한 줄로 작성하라>"""
+    
     all_response = ollama.generate(model='EEVE-Korean-10.8B', prompt=all_prompt)
     with open("eeve_response_text.txt", "w", encoding="utf-8") as f:
         f.write(all_response["response"])
@@ -78,19 +78,17 @@ def get_last_message():
 # 노이즈 mp3 생성 함수
 def get_mp3(path, try_num, vol=35):
     sound = AudioSegment.from_file(path)
-
-    # 최초 음원이라면, 빠르기 조절
-    if path[:3] == 'log':
-        print('first!')
-        faster = sound.speedup(playback_speed=1.2)
-
+    
+    # 빠르기 조절
+    faster = sound.speedup(playback_speed=1.2)
+        
     # 피치 조절 (중간 톤 높이기 → 날카로운 기계 톤)
     higher = faster._spawn(faster.raw_data, overrides={
         "frame_rate": int(faster.frame_rate * 1.5)
     }).set_frame_rate(faster.frame_rate)
 
     # 약간 디지털 느낌 주기 (volume 줄이고 distortion 느낌)
-    higher = higher - 5
+    # higher = higher - 3
 
     # 화이트 노이즈 생성
     noise = WhiteNoise().to_audio_segment(duration=len(higher), volume=(-1) * vol)
