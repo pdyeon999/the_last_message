@@ -80,7 +80,7 @@ def get_mp3(path, try_num, vol=35):
     sound = AudioSegment.from_file(path)
     
     # 빠르기 조절
-    faster = sound.speedup(playback_speed=1.2)
+    faster = sound.speedup(playback_speed=1.13)
         
     # 피치 조절 (중간 톤 높이기 → 날카로운 기계 톤)
     higher = faster._spawn(faster.raw_data, overrides={
