@@ -37,7 +37,22 @@
 
 ## 🖼️ 화면 구성
 ### ⚙️ 예시 화면
-(사진 첨부)
+
+1. 시작
+<img width="1919" height="864" alt="image" src="https://github.com/user-attachments/assets/ef4fc28c-a46d-4c7b-b914-bc10c4ef2b36" />
+
+2. '복원하러 가기' 클릭 시
+<img width="1919" height="860" alt="image" src="https://github.com/user-attachments/assets/98e07fc7-1f44-418a-ad50-428fc2bb17d9" />
+
+2-1. 내용 입력 시
+<img width="1919" height="858" alt="image" src="https://github.com/user-attachments/assets/15d4820b-6bfe-49ee-a2b3-576bfc14bdb3" />
+
+3-1. 성공 화면
+<img width="1919" height="859" alt="image" src="https://github.com/user-attachments/assets/fb22170d-794e-4bb9-8a67-75ef512181aa" />
+
+3-2. 실패 화면
+<img width="1919" height="863" alt="image" src="https://github.com/user-attachments/assets/b5510978-acb8-4899-b649-af630043e67d" />
+
 
 ---
 
@@ -60,8 +75,9 @@ streamlit run app.py
 streamlit run app.py --server.enableCORS=false --server.enableXsrfProtection=false --server.port=7860 --server.address=0.0.0.0
 ```
 
-
-
+## 🎮 시연
+↗️
+---
 ## 💡 트러블슈팅 & 팁
 
 * Ollama 연결 오류 → 모델 설치 후 ollama pull EEVE 확인, `pip install Ollama`
